@@ -9,7 +9,7 @@ class Genre(models.Model):
     """Модель жанров."""
     name = models.CharField(
         verbose_name='Название жанра',
-        max_length=100,
+        max_length=256,
         db_index=True
     )
     slug = models.SlugField(
@@ -62,17 +62,23 @@ class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(
         verbose_name='Название произведения',
-        max_length=200,
+        max_length=256,
         db_index=True
-    )
-    description = models.TextField(
-        verbose_name='Описание',
-        max_length=255,
-        blank=True
     )
     year = models.PositiveIntegerField(
         verbose_name='Год выпуска',
         db_index=True,
+    )
+    description = models.TextField(
+        verbose_name='Описание',
+        max_length=256,
+        blank=True
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+        verbose_name='Жанр',
+        related_name='titles'
     )
     category = models.ForeignKey(
         Category,
@@ -80,12 +86,6 @@ class Title(models.Model):
         related_name='category',
         verbose_name='Категория',
         null=True
-    )
-    genre = models.ManyToManyField(
-        Genre,
-        through='GenreTitle',
-        verbose_name='Жанр',
-        related_name='titles'
     )
 
     class Meta:
