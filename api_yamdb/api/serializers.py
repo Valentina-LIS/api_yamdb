@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -70,3 +70,52 @@ class TitleCreateSerializer(serializers.ModelSerializer):
                 }
             )
         return value
+
+
+class ReviewsSerializer(serializers.ModelSerializer):
+    """Сериалайзер для отзывов."""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('id', 'title', 'author', 'pub_date')
+
+    def validate_score(self, score):
+        """
+        Проверка рейтинга, что в диапозоне от 0 до 10.
+        """
+        if not (0 < score <= 10):
+            raise serializers.ValidationError(
+                'Рейтинг должен быть в интервале от 1 до 10.'
+            )
+        return score
+
+    def validate(self, data):
+        """
+        Проверка на уникальность.
+        1 отзыв от 1 автора для 1 произведения.
+        """
+        request = self.context.get('request')
+        title = self.context.get('view').kwargs.get('title_id')
+        review_exists = Review.objects.filter(title=title,
+                                              author=request.user).exists()
+        is_post_request = request.method == 'POST'
+        if review_exists and is_post_request:
+            raise serializers.ValidationError(
+                'Можно оставить только один отзыв!'
+            )
+        return data
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    """Сериалайзер для комментариев."""
+    author = serializers.SlugRelatedField(read_only=True,
+                                          slug_field='username')
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'review', 'text', 'author', 'pub_date')
+        read_only_fields = ('review',)
