@@ -5,8 +5,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='test_password_1234')
+
 DEBUG = os.getenv('DEBUG') == 'True'
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -15,13 +18,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # installed
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
-
-    # custom
+    'api.apps.ApiConfig',
+    'reviews.apps.ReviewsConfig',
     'users.apps.UsersConfig'
 ]
 
@@ -78,14 +79,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 LANGUAGE_CODE = 'ru-Ru'
+
 TIME_ZONE = 'Europe/Moscow'
+
 USE_I18N = True
+
 USE_L10N = True
+
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
 
 AUTH_USER_MODEL = 'users.CustomUser'
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
