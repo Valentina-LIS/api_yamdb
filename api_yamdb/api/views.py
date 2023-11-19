@@ -1,8 +1,10 @@
 from rest_framework import filters, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
+
 from reviews.models import Category, Genre, Title
 from api.filters import TitleFilter
+from users.permissions import IsAdminOrReadOnly
 from api.serializers import (CategorySerializer, CommentsSerializer,
                              GenreSerializer, ReviewsSerializer,
                              TitleSerializer, TitleCreateSerializer)
@@ -13,6 +15,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')).order_by('name')
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
@@ -28,6 +31,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """Категории."""
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -37,6 +41,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     """Жанры."""
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
