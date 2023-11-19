@@ -44,7 +44,6 @@ class TokenSerializer(serializers.Serializer):
             return response.Response(
                 f'Пользователь {username} не существует',
                 status=status.HTTP_404_NOT_FOUND
-
             )
 
         if user.confirmation_code != confirmation_code:
@@ -76,6 +75,8 @@ class SignupSerializer(serializers.ModelSerializer):
 
         if CustomUser.objects.filter(username__iexact=username).exists():
             raise serializers.ValidationError(f'"{username}" уже существует')
+
+        return attrs
 
 
 class CustomUserMeSerializer(CustomUserSerializer):

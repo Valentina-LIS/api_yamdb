@@ -28,7 +28,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, IsAdmin)
     search_fields = ('username',)
     filter_backends = (filters.SearchFilter,)
-    http_method_names = ('get', 'post', 'patch', 'put', 'delete')
+    http_method_names = ('get', 'post', 'patch', 'delete')
     lookup_field = 'username'
 
     @action(detail=False,
@@ -74,8 +74,8 @@ class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        email = request.get('email')
-        username = request.get('username')
+        email = request.data.get('email')
+        username = request.data.get('username')
 
         if CustomUser.objects.filter(email=email, username=username).exists():
             send_confirmation_code(request)
