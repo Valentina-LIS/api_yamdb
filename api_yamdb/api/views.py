@@ -7,6 +7,7 @@ from reviews.models import Category, Genre, Title, Review
 from api.filters import TitleFilter
 from users.permissions import (IsAdminOrReadOnly,
                                IsAuthorModeratorAdminOrReadOnly)
+from .mixins import ListCreateDestroyMixin
 from api.serializers import (CategorySerializer, CommentsSerializer,
                              GenreSerializer, ReviewsSerializer,
                              TitleSerializer, TitleCreateSerializer)
@@ -20,6 +21,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_serializer_class(self):
         """Определяет какой сериализатор будет использоваться
@@ -29,7 +31,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleCreateSerializer
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(ListCreateDestroyMixin):
     """Категории."""
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
@@ -39,7 +41,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ListCreateDestroyMixin):
     """Жанры."""
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
@@ -53,6 +55,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     """Отзывы."""
     serializer_class = ReviewsSerializer
     permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -69,6 +72,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     """Комментарии."""
     serializer_class = CommentsSerializer
     permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
