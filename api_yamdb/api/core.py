@@ -4,7 +4,7 @@ import string
 from django.core.mail import send_mail
 from rest_framework.generics import get_object_or_404
 
-from users.constants import CONFIRM_CODE_SIZE, NO_REPLY_MAIL
+from users.constants import CONFIRM_CODE_SIZE
 from users.models import CustomUser
 
 
@@ -21,7 +21,7 @@ def send_confirmation_code(request):
     send_mail(
         'Код подтвержения',
         f'Ваш код {user.confirmation_code} никому не сообщайте.',
-        NO_REPLY_MAIL,
+        None,
         [request.data.get('email')],
         fail_silently=False,
     )
