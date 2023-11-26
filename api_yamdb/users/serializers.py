@@ -55,8 +55,6 @@ class TokenSerializer(serializers.Serializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=FIELD_DEFAULT_LEN)
-
     class Meta:
         model = CustomUser
         fields = ('email', 'username')
