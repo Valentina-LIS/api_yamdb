@@ -107,7 +107,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Произведения."""
     serializer_class = TitleSerializer
     queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')).order_by('name')
+        rating=Avg('reviews__score')
+    ).order_by('name').select_related('category').prefetch_related('genre')
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -150,7 +151,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
-        return title.reviews.all()
+        return title.reviews.all().select_related('author')
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -167,7 +168,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
-        return review.comments.all()
+        return review.comments.all().select_related('author')
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
