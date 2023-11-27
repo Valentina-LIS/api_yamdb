@@ -1,18 +1,17 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from users.constants import ADMIN, FIELD_DEFAULT_LEN, MODERATOR, USER
+from users.constants import (
+    ADMIN, EMAIL_FIELD_LEN, FIELD_DEFAULT_LEN, MODERATOR, USER
+)
 
 
 class CustomUser(AbstractUser):
-    ADMIN_ROLE = ADMIN
-    MODERATOR_ROLE = MODERATOR
-    USER_ROLE = USER
-    CHOICES_ROLE = (
-        (ADMIN, 'Администратор'),
-        (MODERATOR, 'Модератор'),
-        (USER, 'Пользователь'),
-    )
+    class Roles(models.TextChoices):
+        ADMIN_ROLE = (ADMIN, 'Администратор')
+        MODERATOR_ROLE = (MODERATOR, 'Модератор')
+        USER_ROLE = (USER, 'Пользователь')
+
     first_name = models.CharField(
         'Имя',
         max_length=FIELD_DEFAULT_LEN,
@@ -26,13 +25,13 @@ class CustomUser(AbstractUser):
     email = models.EmailField(
         'E-mail',
         unique=True,
-        max_length=FIELD_DEFAULT_LEN
+        max_length=EMAIL_FIELD_LEN
     )
     role = models.CharField(
         'Роль',
         default=USER,
         max_length=FIELD_DEFAULT_LEN,
-        choices=CHOICES_ROLE
+        choices=Roles.choices
     )
     bio = models.TextField(
         'О себе',
@@ -41,27 +40,26 @@ class CustomUser(AbstractUser):
     confirmation_code = models.CharField(
         'Код подтверждения',
         max_length=FIELD_DEFAULT_LEN,
-        null=True
     )
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
+    def __str__(self):
+        return self.username
+
     @property
     def is_admin(self):
         return (
-            self.role == self.ADMIN_ROLE
+            self.role == self.Roles.ADMIN_ROLE
             or (self.is_staff and self.is_superuser)
         )
 
     @property
     def is_moderator(self):
-        return self.role == self.MODERATOR_ROLE
+        return self.role == self.Roles.MODERATOR_ROLE
 
     @property
     def is_user(self):
-        return self.role == self.USER_ROLE
-
-    def __str__(self):
-        return self.username
+        return self.role == self.Roles.USER_ROLE
